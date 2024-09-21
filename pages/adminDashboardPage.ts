@@ -1,9 +1,8 @@
 import { Locator, Page } from "@playwright/test";
+import { AuthorizedPage } from "./authorizedPage";
 
-export class AdminDashboardPage {
-    readonly signOutLink: Locator
-
+export class AdminDashboardPage extends AuthorizedPage {
     constructor(public page: Page) {
-      this.signOutLink = page.getByTestId('nav-sign-out')
+      super(page)
     }
 }
