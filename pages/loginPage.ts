@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test";
+import { LoginAccount } from "../test-data/loginAccounts";
 
 export class LoginPage {
   readonly path: string = '/auth/login'
@@ -18,9 +19,9 @@ export class LoginPage {
     await this.page.goto(this.path)
   }
 
-  async login(emailAddress: string, password: string) {
-    await this.emailAddressInput.fill(emailAddress)
-    await this.passwordInput.fill(password)
+  async login(userLogin: LoginAccount) {
+    await this.emailAddressInput.fill(userLogin.email)
+    await this.passwordInput.fill(userLogin.password)
     await this.loginBtn.click()
   }
 }
