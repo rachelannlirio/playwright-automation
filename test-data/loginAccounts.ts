@@ -3,7 +3,7 @@ export type LoginAccount = {
   password: string
 }
 
-export const loginAccount = {
+export const userCredentials = {
   'admin': {
     email: 'admin@practicesoftwaretesting.com',
     password: 'welcome01'
@@ -14,4 +14,4 @@ export const loginAccount = {
   } as LoginAccount,
 }
 
-export type AccountType = keyof typeof loginAccount
+export type AccountType = keyof typeof userCredentials

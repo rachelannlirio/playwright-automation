@@ -1,30 +1,41 @@
 import { test, expect } from '@playwright/test'
 import { LoginPage } from '../pages/loginPage'
 import { AdminDashboardPage } from '../pages/adminDashboardPage'
-import { CustomerDashboardPage } from '../pages/customerDashboardPage'
-import { LoginAccount, loginAccount } from '../test-data/loginAccounts'
+import { CustomerAccountPage } from '../pages/customerDashboardPage'
+import { LoginAccount, userCredentials } from '../test-data/loginAccounts'
+import { HomePage } from '../pages/homePage'
 
-[
-  { userLogin: loginAccount['admin'] as LoginAccount, userType: 'admin', expectedPageTitle: 'Sales over the years' },
-  { userLogin: loginAccount['customer'] as LoginAccount, userType: 'customer', expectedPageTitle: 'My account' }
-].forEach(( {userLogin, userType, expectedPageTitle}) => {
-  test.describe(() => {
-    test.beforeEach(async ({ page }) => {
-      const loginPage = new LoginPage(page)
-      await loginPage.open()
-      await loginPage.login(userLogin)
-    })
+const validScenarios = [
+  { userLogin: userCredentials['admin'] as LoginAccount, userType: 'admin', expectedPageTitle: 'Sales over the years' },
+  { userLogin: userCredentials['customer'] as LoginAccount, userType: 'customer', expectedPageTitle: 'My account' }
+]
+validScenarios.forEach(( {userLogin, userType, expectedPageTitle}) => {
+  test(`can login with valid ${userType} user`, async ({ page }) => {
+    const homePage = new HomePage(page)
+    await homePage.open()
+    await homePage.clickSignIn()
+    const loginPage = new LoginPage(page)
+    await loginPage.login(userLogin)
 
-    test(`can login with valid ${userType} user`, async ({ page }) => {
-      let dashboardPage: AdminDashboardPage | CustomerDashboardPage
-      if (userType === 'admin') {
-        dashboardPage = new AdminDashboardPage(page)
-      } else {
-        dashboardPage = new CustomerDashboardPage(page)
-      }
+    let dashboardPage: AdminDashboardPage | CustomerAccountPage
+    dashboardPage = (userType === 'admin') ? 
+              new AdminDashboardPage(page) : new CustomerAccountPage(page)
+    await expect(dashboardPage.signOutLink).toBeEnabled()
+    await expect(dashboardPage.pageTitle).toHaveText(expectedPageTitle)
+  })
+})
 
-      await expect(dashboardPage.signOutLink).toBeEnabled()
-      await expect(dashboardPage.pageTitle).toHaveText(expectedPageTitle)
-    })
+const invalidScenarios = [
+  { email: userCredentials['admin'].email, password: 'invalidPassword', scenario: 'valid email but incorrect password' },
+  { email: 'invalid.email@testing.com', password: 'invalidPassword', scenario: 'incorrect email and password' }
+]
+invalidScenarios.forEach(( {email, password, scenario}) => {
+  test(`unable to login with ${scenario}`, async ({ page }) => {
+    const homePage = new HomePage(page)
+    await homePage.open()
+    homePage.clickSignIn()
+    const loginPage = new LoginPage(page)
+    await loginPage.login({email, password} as LoginAccount)
+    await expect(loginPage.loginErrorMsg).toHaveText('Invalid email or password')
   })
 })
