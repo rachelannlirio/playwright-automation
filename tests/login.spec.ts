@@ -12,16 +12,18 @@ const validScenarios = [
 validScenarios.forEach(( {userLogin, userType, expectedPageTitle}) => {
   test(`can login with valid ${userType} user`, async ({ page }) => {
     const homePage = new HomePage(page)
-    await homePage.open()
-    await homePage.clickSignIn()
     const loginPage = new LoginPage(page)
-    await loginPage.login(userLogin)
-
     let dashboardPage: AdminDashboardPage | CustomerAccountPage
     dashboardPage = (userType === 'admin') ? 
-              new AdminDashboardPage(page) : new CustomerAccountPage(page)
-    await expect(dashboardPage.signOutLink).toBeEnabled()
+      new AdminDashboardPage(page) : new CustomerAccountPage(page)
+
+    await homePage.open()
+    await homePage.clickSignIn()
+    await loginPage.login(userLogin)
+
     await expect(dashboardPage.pageTitle).toHaveText(expectedPageTitle)
+    await dashboardPage.openNavigationMenu()
+    await expect(dashboardPage.signOut).toBeVisible()
   })
 })
 
@@ -32,9 +34,10 @@ const invalidScenarios = [
 invalidScenarios.forEach(( {email, password, scenario}) => {
   test(`unable to login with ${scenario}`, async ({ page }) => {
     const homePage = new HomePage(page)
-    await homePage.open()
-    homePage.clickSignIn()
     const loginPage = new LoginPage(page)
+
+    await homePage.open()
+    await homePage.clickSignIn()
     await loginPage.login({email, password} as LoginAccount)
     await expect(loginPage.loginErrorMsg).toHaveText('Invalid email or password')
   })
