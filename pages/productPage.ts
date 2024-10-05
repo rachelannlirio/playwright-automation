@@ -11,6 +11,7 @@ export class ProductPage extends BasePage {
   readonly quantityInput: Locator
   readonly increaseQuantity: Locator
   readonly decreaseQuantity: Locator
+  readonly productAddedToast: Locator
 
   constructor(page: Page) {
     super(page)
@@ -23,6 +24,7 @@ export class ProductPage extends BasePage {
     this.increaseQuantity = page.getByTestId('increase-quantity')
     this.decreaseQuantity = page.getByTestId('decrease-quantity')
     this.relatedProductsHeader = page.getByRole('heading', { name: 'Related Products' })
+    this.productAddedToast = page.locator('css=.toast-success')
   }
 
   async updateQuantityByInput(quantity: number) {
@@ -31,5 +33,10 @@ export class ProductPage extends BasePage {
 
   async clickAddToCart() {
     await this.addToCartBtn.click()
+  }
+
+  async dismissProductAddedToast() {
+    await this.productAddedToast.click()
+    await this.productAddedToast.waitFor({ state: 'hidden' })
   }
 }

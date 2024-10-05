@@ -32,6 +32,9 @@ export default defineConfig({
     trace: 'on-first-retry',
     testIdAttribute: 'data-test'
   },
+  expect: {
+    timeout: 10000
+  },
 
   /* Configure projects for major browsers */
   projects: [

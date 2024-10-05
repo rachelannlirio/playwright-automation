@@ -5,7 +5,7 @@ export class HomePage extends BasePage {
   readonly path: string = '/'
   readonly signInLink: Locator
   readonly products: Locator
-  
+
   constructor(page: Page) {
     super(page)
     this.signInLink = page.getByTestId('nav-sign-in')

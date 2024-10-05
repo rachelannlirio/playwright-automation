@@ -1,4 +1,5 @@
 import { Locator, Page } from "@playwright/test"
+import { path } from "../../constants/path"
 
 export class NavigationHeader {
   readonly home: Locator
@@ -7,7 +8,6 @@ export class NavigationHeader {
   readonly cart: Locator
   readonly cartQuantity: Locator
   readonly languageSelector: Locator
-  readonly productAddedToast: Locator
 
   constructor(public page: Page) {
     this.home = page.getByTestId('nav-home')
@@ -16,10 +16,14 @@ export class NavigationHeader {
     this.cart = page.getByTestId('nav-cart')
     this.cartQuantity = page.getByTestId('cart-quantity')
     this.languageSelector = page.getByTestId('language')
-    this.productAddedToast = page.locator('css=.toast-container')
   }
 
   async goToCart() {
     await this.cart.click()
+    await this.page.waitForURL(`**${path.cart}`)
+  }
+
+  async goToHome() {
+    await this.home.click()
   }
 }

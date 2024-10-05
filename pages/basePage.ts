@@ -3,7 +3,7 @@ import { NavigationHeader } from "./components/navigationHeader"
 
 export class BasePage {
   readonly page: Page
-  readonly path: string
+  path: string
   readonly navigationHeader: NavigationHeader
 
   constructor(page: Page) {

@@ -1,9 +1,9 @@
 import { Locator, Page } from "@playwright/test";
 import { LoginAccount } from "../test-data/loginAccounts";
 import { BasePage } from "./basePage";
+import { path } from "../constants/path";
 
 export class LoginPage extends BasePage {
-  readonly path: string = '/auth/login'
   readonly loginHeader: Locator
   readonly emailAddressInput: Locator
   readonly passwordInput: Locator
@@ -12,6 +12,7 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page)
+    this.path = path.login
     this.loginHeader = page.getByRole('heading', { name: 'Login' })
     this.emailAddressInput = page.getByTestId('email')
     this.passwordInput = page.getByTestId('password')

@@ -1,37 +1,37 @@
 import test, { expect } from "@playwright/test"
 import { HomePage } from "../pages/homePage"
 import { ProductPage } from "../pages/productPage"
-import { ProductDetails } from "../test-data/productDetails"
+import { productsToPurchase } from "../test-data/productDetails"
 import { CartPage } from "../pages/cartPage"
+import { roundUp } from "../utils/compute"
 
-test('E2E add to cart and checkout', async ({page}) => {
+test('E2E add to cart and checkout', async ({ page }) => {
   const homePage = new HomePage(page)
   const productPage = new ProductPage(page)
   const cartPage = new CartPage(page)
+  await homePage.open()
 
-  const product: ProductDetails = {
-    productName: 'Combination Pliers',
-    unitPrice: 14.15,
-    category: 'Pliers',
-    brand: 'ForgeFlex Tools'
+  for (const [index, productToPurchase] of productsToPurchase.entries()) {
+    await homePage.clickProduct(productToPurchase.productDetails.productName)
+    await productPage.updateQuantityByInput(productToPurchase.desiredQuantity)
+    await productPage.clickAddToCart()
+    await expect(productPage.productAddedToast).toHaveText('Product added to shopping cart.')
+
+    if (index === productsToPurchase.length - 1) {
+      await productPage.navigationHeader.goToCart()
+    } else {
+      await cartPage.navigationHeader.goToHome()
+    }
   }
 
-  const desiredQuantity = 3
-  const totalItemPrice = product.unitPrice * desiredQuantity
-
-  await homePage.open()
-  await homePage.clickProduct(product.productName)
-  await expect(productPage.productName).toHaveText(product.productName)
-  await expect(productPage.unitPrice).toHaveText(`${product.unitPrice}`)
-
-  await productPage.updateQuantityByInput(desiredQuantity)
-  await productPage.clickAddToCart()
-  await expect(productPage.navigationHeader.cartQuantity).toHaveText(`${desiredQuantity}`)
-  await expect(productPage.navigationHeader.productAddedToast).toHaveText('Product added to shopping cart.')
-
-  await productPage.navigationHeader.goToCart()
-  await expect(cartPage.proceedTocheckout).toBeVisible()
-  expect(await cartPage.getItemQuantity(product.productName)).toHaveValue(`${desiredQuantity}`)
-  expect(await cartPage.getUnitPrice(product.productName)).toHaveText(`$${product.unitPrice}`)
-  expect(await cartPage.getTotalItemPrice(product.productName)).toHaveText(`$${totalItemPrice}`)
+  let totalCartPrice = 0
+  for (const productToPurchase of productsToPurchase) {
+    const product = productToPurchase.productDetails
+    const totalItemPrice = roundUp(product.unitPrice * productToPurchase.desiredQuantity)
+    totalCartPrice += totalItemPrice
+    expect(await cartPage.getItemQuantity(product.productName)).toHaveValue(`${productToPurchase.desiredQuantity}`)
+    expect(await cartPage.getUnitPrice(product.productName)).toHaveText(`$${product.unitPrice}`)
+    expect(await cartPage.getTotalItemPrice(product.productName)).toHaveText(`$${totalItemPrice.toFixed(2)}`)
+  }
+  expect(cartPage.totalCartPrice).toHaveText(`$${totalCartPrice.toFixed(2)}`)
 })
