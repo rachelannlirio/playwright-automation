@@ -1,6 +1,9 @@
 import { Locator, Page } from "@playwright/test"
 import { BasePage } from "./basePage"
 import { path } from "../constants/path"
+import { AppLogin } from "./components/appLogin"
+import { AppAddress } from "./components/appAddress"
+import { AppPayment } from "./components/appPayment"
 
 export class CartPage extends BasePage {
   readonly appCheckout: Locator
@@ -11,8 +14,12 @@ export class CartPage extends BasePage {
   readonly totalItemPrice: Locator
   readonly totalCartPrice: Locator
   readonly emptyCartMessage: Locator
-  readonly proceedTocheckout: Locator
+  readonly proceedToCheckout: Locator
   readonly appCart: Locator
+
+  readonly appLogin: AppLogin
+  readonly appAddress: AppAddress
+  readonly appPayment: AppPayment
 
   constructor(page: Page) {
     super(page)
@@ -24,8 +31,12 @@ export class CartPage extends BasePage {
     this.totalItemPrice = page.getByRole('cell').nth(3)
     this.totalCartPrice = page.locator('tfoot').locator(page.getByRole('cell').nth(3))
     this.emptyCartMessage = page.getByRole('paragraph').filter({ hasText: 'The cart is empty. Nothing to display.' })
-    this.proceedTocheckout = page.getByTestId('proceed-1')
+    this.proceedToCheckout = page.getByTestId('proceed-1')
     this.appCart = page.locator('app-cart')
+
+    this.appLogin = new AppLogin(page)
+    this.appAddress = new AppAddress(page)
+    this.appPayment = new AppPayment(page)
   }
 
   async getItemFromCart(productName: string): Promise<Locator> {
@@ -50,5 +61,9 @@ export class CartPage extends BasePage {
 
   async getTotalItemPrice(productName: string) {
     return (await this.getItemFromCart(productName)).locator(this.totalItemPrice)
+  }
+
+  async clickProceedToCheckout(loggedIn: boolean) {
+    loggedIn ? this.appLogin.proceedToCheckout.click() : this.proceedToCheckout.click()
   }
 }

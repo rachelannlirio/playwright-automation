@@ -4,8 +4,11 @@ import { ProductPage } from "../pages/productPage"
 import { productsToPurchase } from "../test-data/productDetails"
 import { CartPage } from "../pages/cartPage"
 import { roundUp } from "../utils/compute"
+import { userCredentials } from "../test-data/loginAccounts"
+import { billingAddress } from "../test-data/billingAddress"
+import { creditCard } from "../test-data/paymentMethods"
 
-test('E2E add to cart and checkout', async ({ page }) => {
+test('E2E purchase as existing customer', async ({ page }) => {
   const homePage = new HomePage(page)
   const productPage = new ProductPage(page)
   const cartPage = new CartPage(page)
@@ -34,4 +37,14 @@ test('E2E add to cart and checkout', async ({ page }) => {
     expect(await cartPage.getTotalItemPrice(product.productName)).toHaveText(`$${totalItemPrice.toFixed(2)}`)
   }
   expect(cartPage.totalCartPrice).toHaveText(`$${totalCartPrice.toFixed(2)}`)
+
+  await cartPage.clickProceedToCheckout(false)
+  await cartPage.appLogin.login(userCredentials.customer)
+  await expect(cartPage.appLogin.signInMessage)
+    .toHaveText(`Hello ${userCredentials.customer.name}, you are already logged in. You can proceed to checkout.`)
+  await cartPage.clickProceedToCheckout(true)
+
+  await cartPage.appAddress.fillUpBillingAddress(billingAddress)
+  await cartPage.appPayment.useCreditCard(creditCard)
+  await expect(cartPage.appPayment.successMessage).toHaveText('Payment was successful')
 })
