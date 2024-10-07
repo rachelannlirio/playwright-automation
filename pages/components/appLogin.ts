@@ -13,6 +13,8 @@ export class AppLogin {
   readonly signInMessage: Locator
   readonly proceedToCheckout: Locator
 
+  readonly registerLink: Locator
+
   constructor(page: Page) {
     this.appLoginElem = page.locator('app-login')
 
@@ -24,11 +26,17 @@ export class AppLogin {
 
     this.signInMessage = this.appLoginElem.getByRole('paragraph')
     this.proceedToCheckout = page.getByTestId('proceed-2')
+
+    this.registerLink = page.getByTestId('register-link')
   }
 
   async login(userLogin: LoginAccount) {
     await this.emailAddressInput.fill(userLogin.email);
     await this.passwordInput.fill(userLogin.password);
     await this.loginBtn.click();
+  }
+
+  async clickRegisterYourAccount() {
+    await this.registerLink.click()
   }
 }
