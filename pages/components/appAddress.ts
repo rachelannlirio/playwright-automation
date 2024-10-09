@@ -9,7 +9,7 @@ export class AppAddress {
   readonly state: Locator
   readonly country: Locator
   readonly postcode: Locator
-  readonly billingAddressCheckout: Locator
+  readonly proceedToCheckout: Locator
 
   constructor(page: Page) {
     this.appAddressElem = page.locator('app-address')
@@ -19,7 +19,7 @@ export class AppAddress {
     this.state = this.appAddressElem.getByTestId('state')
     this.country = this.appAddressElem.getByTestId('country')
     this.postcode = this.appAddressElem.getByTestId('postcode')
-    this.billingAddressCheckout = page.getByTestId('proceed-3')
+    this.proceedToCheckout = page.getByTestId('proceed-3')
   }
 
   async fillUpBillingAddress(billingAddress: BillingAddress) {
@@ -28,7 +28,11 @@ export class AppAddress {
     await this.state.fill(billingAddress.state)
     await this.country.fill(billingAddress.country)
     await this.postcode.fill(billingAddress.postcode)
-    await this.billingAddressCheckout.click()
+    await this.clickProceedToCheckout()
     await this.appAddressElem.waitFor({ state: 'hidden' })
+  }
+
+  async clickProceedToCheckout() {
+    await this.proceedToCheckout.click()
   }
 }

@@ -1,8 +1,8 @@
 import { Locator, Page } from "@playwright/test"
-import { BasePage } from "./basePage"
 import { path } from "../constants/path"
-import { AppLogin } from "./components/appLogin"
+import { BasePage } from "./basePage"
 import { AppAddress } from "./components/appAddress"
+import { AppLogin } from "./components/appLogin"
 import { AppPayment } from "./components/appPayment"
 
 export class CartPage extends BasePage {
@@ -63,7 +63,7 @@ export class CartPage extends BasePage {
     return (await this.getItemFromCart(productName)).locator(this.totalItemPrice)
   }
 
-  async clickProceedToCheckout(loggedIn: boolean) {
-    loggedIn ? this.appLogin.proceedToCheckout.click() : this.proceedToCheckout.click()
+  async clickProceedToCheckout() {
+    this.proceedToCheckout.click()
   }
 }

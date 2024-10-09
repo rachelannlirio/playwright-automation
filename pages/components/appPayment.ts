@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test";
-import { CreditCard } from "../../test-data/paymentMethods";
+import { CreditCardDetails } from "../../test-data/paymentMethods";
 
 export class AppPayment {
   readonly appPaymentElem: Locator
@@ -22,11 +22,11 @@ export class AppPayment {
     this.successMessage = page.locator('css=div.alert-success')
   }
 
-  async useCreditCard(creditCard: CreditCard) {
+  async useCreditCard(creditCard: CreditCardDetails) {
     await this.paymentMethod.selectOption('credit-card')
     await this.creditCardNumber.fill(creditCard.cardNumber)
     await this.expirationDate.fill(creditCard.expirationDate)
-    await this.cvv.fill(creditCard.cvv)
+    await this.cvv.fill(`${creditCard.cvv}`)
     await this.cardHolderName.fill(creditCard.cardHolderName)
     await this.confirmBtn.click()
   }
