@@ -52,12 +52,16 @@ export class RegistrationPage extends BasePage {
   }
 
   async fillUpDateOfBirth(dob: Date) {
+    console.log(`Date of birth: ${dob}`)
+    console.log(`Year: ${dob.getFullYear()}`)
     await this.dateOfBirth.click()
     await this.dateOfBirth.pressSequentially(`${dob.getFullYear()}`)
     await this.dateOfBirth.press('Tab')
     const birthMonth = (dob.getMonth() + 1).toString().padStart(2, '0')
+    console.log(`Year: ${birthMonth}`)
     await this.dateOfBirth.pressSequentially(birthMonth)
     const birthDay = dob.getDay().toString().padStart(2, '0')
+    console.log(`Year: ${birthDay}`)
     await this.dateOfBirth.pressSequentially(birthDay)
   }
 }

@@ -34,6 +34,7 @@ export default defineConfig({
       mode: 'only-on-failure', // Take screenshot on failure
       fullPage: true
     },
+    video: 'on-first-retry',
     testIdAttribute: 'data-test',
     // launchOptions: {
     //   slowMo: 1000
