@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test"
-import { LoginAccount } from "../../test-data/loginAccounts"
+import { LoginAccount } from "../../test-data/userAccounts"
 
 export class AppLogin {
   readonly appLoginElem: Locator
@@ -23,20 +23,22 @@ export class AppLogin {
     this.passwordInput = page.getByTestId('password')
     this.loginBtn = page.getByTestId('login-submit')
     this.loginErrorMsg = page.getByTestId('login-error')
-
     this.signInMessage = this.appLoginElem.getByRole('paragraph')
     this.proceedToCheckout = page.getByTestId('proceed-2')
-
     this.registerLink = page.getByTestId('register-link')
   }
 
   async login(userLogin: LoginAccount) {
-    await this.emailAddressInput.fill(userLogin.email);
-    await this.passwordInput.fill(userLogin.password);
-    await this.loginBtn.click();
+    await this.emailAddressInput.fill(userLogin.email)
+    await this.passwordInput.fill(userLogin.password)
+    await this.loginBtn.click()
   }
 
   async clickRegisterYourAccount() {
     await this.registerLink.click()
+  }
+
+  async clickProceedToCheckout() {
+    this.proceedToCheckout.click()
   }
 }

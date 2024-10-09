@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker'
+
 export type BillingAddress = {
   address: string
   city: string
@@ -6,10 +8,14 @@ export type BillingAddress = {
   postcode: string
 }
 
-export const billingAddress: BillingAddress = {
-  address: '123 Berlin St',
-  city: 'Sydney',
-  state: 'New South Wales',
-  country: 'Australia',
-  postcode: '2000'
+export const countryList = ['AL', 'AX', 'DZ', 'AU', 'NZ', 'PH', 'PE', 'ML', 'MV', 'GB', 'US', 'UY', 'UZ', 'MQ', 'MR', 'MU']
+
+export function generateRandomBillingAddress(): BillingAddress {
+  return {
+    address: faker.location.streetAddress(),
+    city: faker.location.city(),
+    state: faker.location.state(),
+    country: faker.helpers.arrayElement(countryList),
+    postcode: faker.location.zipCode()
+  }
 }

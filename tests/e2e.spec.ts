@@ -1,22 +1,24 @@
 import test, { expect } from "@playwright/test"
-import { HomePage } from "../pages/homePage"
-import { ProductPage } from "../pages/productPage"
-import { productsToPurchase } from "../test-data/productDetails"
-import { CartPage } from "../pages/cartPage"
-import { roundUp } from "../utils/compute"
-import { userCredentials } from "../test-data/loginAccounts"
-import { billingAddress } from "../test-data/billingAddress"
-import { creditCard } from "../test-data/paymentMethods"
-import { RegistrationPage } from "../pages/registrationPage"
-import { generateRandomRegistrationDetails } from "../test-data/registrationDetails"
 import { path } from "../constants/path"
+import { CartPage } from "../pages/cartPage"
+import { CustomerDashboardPage } from "../pages/customerDashboardPage"
+import { HomePage } from "../pages/homePage"
+import { LoginPage } from "../pages/loginPage"
+import { ProductPage } from "../pages/productPage"
+import { RegistrationPage } from "../pages/registrationPage"
+import { generateRandomBillingAddress } from "../test-data/billingAddress"
+import { creditCardDetails } from "../test-data/paymentMethods"
+import { productsToPurchase } from "../test-data/productDetails"
+import { generateRandomCustomerAccount, userAccounts } from "../test-data/userAccounts"
+import { roundUp } from "../utils/compute"
 
 let homePage: HomePage
 let productPage: ProductPage
 let cartPage: CartPage
 
 test.describe('E2E test: add products to cart and checkout', async () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
+    testInfo.setTimeout(45000)
     homePage = new HomePage(page)
     productPage = new ProductPage(page)
     cartPage = new CartPage(page)
@@ -27,27 +29,57 @@ test.describe('E2E test: add products to cart and checkout', async () => {
     await addProductsToCart()
     await verifyCartContents()
 
-    await cartPage.clickProceedToCheckout(false)
-    await cartPage.appLogin.login(userCredentials.customer)
+    await cartPage.clickProceedToCheckout()
+    const customerAccount = userAccounts.customer
+    await cartPage.appLogin.login(customerAccount.loginAccount)
+    const customerName = `${customerAccount.loginAccount.firstName} ${customerAccount.loginAccount.lastName}`
     await expect(cartPage.appLogin.signInMessage)
-      .toHaveText(`Hello ${userCredentials.customer.name}, you are already logged in. You can proceed to checkout.`)
-    await cartPage.clickProceedToCheckout(true)
+      .toHaveText(`Hello ${customerName}, you are already logged in. You can proceed to checkout.`)
+    await cartPage.appLogin.clickProceedToCheckout()
 
-    await cartPage.appAddress.fillUpBillingAddress(billingAddress)
-    await cartPage.appPayment.useCreditCard(creditCard)
+    const billingAddress = customerAccount.billingAddress
+    await expect(cartPage.appAddress.address).toHaveValue(billingAddress.address)
+    await expect(cartPage.appAddress.city).toHaveValue(billingAddress.city)
+    await expect(cartPage.appAddress.state).toHaveValue(billingAddress.state)
+    await expect(cartPage.appAddress.country).toHaveValue(billingAddress.country)
+    await expect(cartPage.appAddress.postcode).toHaveValue(billingAddress.postcode)
+
+    await cartPage.appAddress.fillUpBillingAddress(generateRandomBillingAddress())
+    await cartPage.appPayment.useCreditCard(creditCardDetails)
     await expect(cartPage.appPayment.successMessage).toHaveText('Payment was successful')
   })
 
   test('E2E purchase as a new customer', async ({ page }) => {
-    test.slow()
     const registrationPage = new RegistrationPage(page)
+    const loginPage = new LoginPage(page)
+    const customerDashboardPage = new CustomerDashboardPage(page)
     await addProductsToCart()
     await verifyCartContents()
 
-    await cartPage.clickProceedToCheckout(false)
+    await cartPage.clickProceedToCheckout()
     await cartPage.appLogin.clickRegisterYourAccount()
-    await registrationPage.register(generateRandomRegistrationDetails())
+    const customerAccount = generateRandomCustomerAccount()
+    await registrationPage.register(customerAccount)
     expect(page.url()).toContain(path.login)
+
+    await loginPage.appLogin.login(customerAccount.loginAccount)
+    await expect(customerDashboardPage.pageTitle).toHaveText('My account')
+    await customerDashboardPage.navigationHeader.goToCart()
+    await cartPage.clickProceedToCheckout()
+    const customerName = `${customerAccount.loginAccount.firstName} ${customerAccount.loginAccount.lastName}`
+    await expect(cartPage.appLogin.signInMessage)
+      .toHaveText(`Hello ${customerName}, you are already logged in. You can proceed to checkout.`)
+    await cartPage.appLogin.clickProceedToCheckout()
+
+    const billingAddress = customerAccount.billingAddress
+    await expect(cartPage.appAddress.address).toHaveValue(billingAddress.address)
+    await expect(cartPage.appAddress.city).toHaveValue(billingAddress.city)
+    await expect(cartPage.appAddress.state).toHaveValue(billingAddress.state)
+    await expect(cartPage.appAddress.country).toHaveValue(billingAddress.country)
+    await expect(cartPage.appAddress.postcode).toHaveValue(billingAddress.postcode)
+    await cartPage.appAddress.clickProceedToCheckout()
+    await cartPage.appPayment.useCreditCard(creditCardDetails)
+    await expect(cartPage.appPayment.successMessage).toHaveText('Payment was successful')
   })
 })
 

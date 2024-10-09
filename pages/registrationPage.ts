@@ -1,6 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 import { path } from "../constants/path";
-import { RegistrationDetails } from "../test-data/registrationDetails";
+import { CustomerAccount } from "../test-data/userAccounts";
 import { BasePage } from "./basePage";
 
 export class RegistrationPage extends BasePage {
@@ -35,18 +35,18 @@ export class RegistrationPage extends BasePage {
     this.registerBtn = page.getByTestId('register-submit')
   }
 
-  async register(registrationDetails: RegistrationDetails) {
-    await this.firstName.fill(registrationDetails.firstName)
-    await this.lastName.fill(registrationDetails.lastName)
-    await this.fillUpDateOfBirth(registrationDetails.dateOfBirth)
-    await this.address.fill(registrationDetails.address)
-    await this.postcode.fill(registrationDetails.postcode)
-    await this.city.fill(registrationDetails.city)
-    await this.state.fill(registrationDetails.state)
-    await this.country.selectOption({ label: registrationDetails.country })
-    await this.phone.fill(registrationDetails.phone)
-    await this.email.fill(registrationDetails.email)
-    await this.password.fill(registrationDetails.password)
+  async register(customerAccount: CustomerAccount) {
+    await this.firstName.fill(customerAccount.loginAccount.firstName)
+    await this.lastName.fill(customerAccount.loginAccount.lastName)
+    await this.fillUpDateOfBirth(customerAccount.personalDetails.dateOfBirth!)
+    await this.address.fill(customerAccount.billingAddress.address)
+    await this.postcode.fill(customerAccount.billingAddress.postcode)
+    await this.city.fill(customerAccount.billingAddress.city)
+    await this.state.fill(customerAccount.billingAddress.state)
+    await this.country.selectOption(customerAccount.billingAddress.country)
+    await this.phone.fill(customerAccount.personalDetails.phone!)
+    await this.email.fill(customerAccount.loginAccount.email)
+    await this.password.fill(customerAccount.loginAccount.password)
     await this.registerBtn.click()
     await this.page.waitForURL(`**${path.login}`)
   }
