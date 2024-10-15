@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test --headed"
+    "test": "npx playwright test --headed",
+    "loginTest": "npx playwright test tests/login.spec.ts --headed",
+    "e2eTest": "npx playwright test tests/e2e.spec.ts --headed"
   },
   "keywords": [],
   "author": "",

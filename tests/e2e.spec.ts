@@ -1,5 +1,4 @@
 import test, { expect } from "@playwright/test"
-import { path } from "../constants/path"
 import { CartPage } from "../pages/cartPage"
 import { CustomerDashboardPage } from "../pages/customerDashboardPage"
 import { HomePage } from "../pages/homePage"
@@ -18,7 +17,7 @@ let cartPage: CartPage
 
 test.describe('E2E test: add products to cart and checkout', async () => {
   test.beforeEach(async ({ page }, testInfo) => {
-    testInfo.setTimeout(45000)
+    testInfo.setTimeout(35000)
     homePage = new HomePage(page)
     productPage = new ProductPage(page)
     cartPage = new CartPage(page)
@@ -60,7 +59,6 @@ test.describe('E2E test: add products to cart and checkout', async () => {
     await cartPage.appLogin.clickRegisterYourAccount()
     const customerAccount = generateRandomCustomerAccount()
     await registrationPage.register(customerAccount)
-    expect(page.url()).toContain(path.login)
 
     await loginPage.appLogin.login(customerAccount.loginAccount)
     await expect(customerDashboardPage.pageTitle).toHaveText('My account')

@@ -1,7 +1,8 @@
-import { Locator, Page } from "@playwright/test"
+import { expect, Locator, Page } from "@playwright/test"
 import { LoginAccount } from "../../test-data/userAccounts"
+import { BasePage } from "../basePage"
 
-export class AppLogin {
+export class AppLogin extends BasePage {
   readonly appLoginElem: Locator
 
   readonly loginHeader: Locator
@@ -16,8 +17,8 @@ export class AppLogin {
   readonly registerLink: Locator
 
   constructor(page: Page) {
+    super(page)
     this.appLoginElem = page.locator('app-login')
-
     this.loginHeader = page.getByRole('heading', { name: 'Login' })
     this.emailAddressInput = page.getByTestId('email')
     this.passwordInput = page.getByTestId('password')
@@ -28,10 +29,18 @@ export class AppLogin {
     this.registerLink = page.getByTestId('register-link')
   }
 
-  async login(userLogin: LoginAccount) {
+  async login(userLogin: LoginAccount, successfulLogin: boolean = true) {
     await this.emailAddressInput.fill(userLogin.email)
     await this.passwordInput.fill(userLogin.password)
-    await this.loginBtn.click()
+
+    await expect(async () => {
+      await this.loginBtn.click()
+      successfulLogin
+        ? await expect(this.navigationHeader.signIn).toBeHidden()
+        : await expect(this.loginErrorMsg).toBeVisible()
+    }).toPass({
+      intervals: [1_000, 2_000, 3_000, 4_000, 5_000],
+    })
   }
 
   async clickRegisterYourAccount() {

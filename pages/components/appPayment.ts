@@ -1,5 +1,5 @@
-import { Locator, Page } from "@playwright/test";
-import { CreditCardDetails } from "../../test-data/paymentMethods";
+import { Locator, Page } from '@playwright/test'
+import { CreditCardDetails } from '../../test-data/paymentMethods'
 
 export class AppPayment {
   readonly appPaymentElem: Locator
@@ -28,6 +28,7 @@ export class AppPayment {
     await this.expirationDate.fill(creditCard.expirationDate)
     await this.cvv.fill(`${creditCard.cvv}`)
     await this.cardHolderName.fill(creditCard.cardHolderName)
+    await this.confirmBtn.isEnabled()
     await this.confirmBtn.click()
   }
 }
