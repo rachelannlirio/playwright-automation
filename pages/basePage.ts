@@ -13,5 +13,6 @@ export class BasePage {
 
   async open() {
     await this.page.goto(this.path)
+    await this.page.waitForLoadState("domcontentloaded")
   }
 }

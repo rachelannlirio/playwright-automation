@@ -9,6 +9,8 @@ export class NavigationHeader {
   readonly cartQuantity: Locator
   readonly languageSelector: Locator
 
+  readonly signIn: Locator
+
   constructor(public page: Page) {
     this.home = page.getByTestId('nav-home')
     this.categoriesSelector = page.getByTestId('nav-categories')
@@ -16,6 +18,8 @@ export class NavigationHeader {
     this.cart = page.getByTestId('nav-cart')
     this.cartQuantity = page.getByTestId('cart-quantity')
     this.languageSelector = page.getByTestId('language')
+
+    this.signIn = page.getByTestId('nav-sign-in')
   }
 
   async goToCart() {
@@ -25,5 +29,11 @@ export class NavigationHeader {
 
   async goToHome() {
     await this.home.click()
+  }
+
+  async clickSignIn() {
+    await this.signIn.click()
+    await this.page.waitForURL(`**${path.login}`)
+    await this.page.waitForLoadState('domcontentloaded')
   }
 }
